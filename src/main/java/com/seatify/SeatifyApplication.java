@@ -1,4 +1,4 @@
-package org.example.seatify;
+package com.seatify;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
