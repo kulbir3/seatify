@@ -71,7 +71,7 @@ spring.datasource.url=jdbc:mysql://localhost:3306/seatify
 spring.datasource.username=YOUR_MYSQL_USERNAME
 spring.datasource.password=YOUR_MYSQL_PASSWORD
 
-spring.jpa.hibernate.ddl-auto=update
+spring.jpa.hibernate.ddl-auto=validation
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 ```
@@ -85,7 +85,7 @@ Replace the username and password with your local MySQL credentials.
 Run the following command from the project directory:
 
 ```bash
-mvn clean install
+mvn clean compile
 ```
 
 ### 5. Run the Application
