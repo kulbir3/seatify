@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title th:text="${event.name} + ' | Seatify'">Event Details | Seatify</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      color: #222;
+      margin: 0;
+    }
+
+    header {
+      background: #171923;
+      padding: 20px 6%;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    header span {
+      color: #ff6b6b;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .category {
+      color: #d94d4d;
+      font-weight: bold;
+    }
+
+    h1 {
+      font-size: 32px;
+    }
+
+    .description {
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .info {
+      margin: 18px 0;
+      line-height: 1.8;
+    }
+
+    .price {
+      color: #198754;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #ff6b6b;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .back {
+      display: inline-block;
+      margin-left: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <a th:href="@{/}">Seat<span>ify</span></a>
+</header>
+
+<main class="container">
+
+  <p class="category" th:text="${event.category.name}">Category</p>
+
+  <h1 th:text="${event.name}">Event Name</h1>
+
+  <p class="description"
+     th:text="${event.description != null
+            ? event.description
+            : 'No description available.'}">
+    Event description
+  </p>
+
+  <div class="info">
+    <p>
+      <strong>Venue:</strong>
+      <span th:text="${event.venue.name}">Venue</span>
+    </p>
+
+    <p>
+      <strong>Address:</strong>
+      <span th:text="${event.venue.address}">Address</span>
+    </p>
+
+    <p>
+      <strong>City:</strong>
+      <span th:text="${event.venue.city}">City</span>
+    </p>
+
+    <p>
+      <strong>Date:</strong>
+      <span th:text="${#temporals.format(event.eventDate, 'dd MMMM yyyy')}">
+                Event date
+            </span>
+    </p>
+
+    <p>
+      <strong>Start time:</strong>
+      <span th:text="${#temporals.format(event.startTime, 'hh:mm a')}">
+                Start time
+            </span>
+    </p>
+
+    <p th:if="${event.endTime != null}">
+      <strong>End time:</strong>
+      <span th:text="${#temporals.format(event.endTime, 'hh:mm a')}">
+                End time
+            </span>
+    </p>
+
+    <p>
+      <strong>Status:</strong>
+      <span th:text="${event.status}">UPCOMING</span>
+    </p>
+  </div>
+
+  <p class="price">
+    NPR <span th:text="${event.price}">0.00</span>
+  </p>
+
+  <a th:href="@{/events/{id}/seats(id=${event.id})}"
+     class="button"
+     title="Seat selection">
+    Select Seats
+  </a>
+
+  <a th:href="@{/}" class="back">Back to Events</a>
+
+</main>
+
+</body>
+</html>

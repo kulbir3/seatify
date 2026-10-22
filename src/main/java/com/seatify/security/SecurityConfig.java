@@ -33,10 +33,10 @@ public class SecurityConfig {
                                 "/images/**"
                         ).permitAll()
 
-                        // Admin-only pages
+                        .requestMatchers("/events/**").authenticated()
+
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // Other pages require login
                         .anyRequest().authenticated()
                 )
 

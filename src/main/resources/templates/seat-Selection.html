@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Seatify | Select Seats</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #10131c;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      padding: 20px 6%;
+      background: #171923;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      color: white;
+      text-decoration: none;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #ff6b6b;
+    }
+
+    .navbar a.home-link {
+      color: #ddd;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 35px auto;
+      padding: 0 20px;
+    }
+
+    .event-heading {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .event-heading h1 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .event-heading p {
+      color: #aeb4c5;
+      margin-top: 6px;
+    }
+
+    .booking-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr);
+      gap: 25px;
+      align-items: start;
+    }
+
+    .seat-panel,
+    .summary-panel {
+      background: #191e2b;
+      border: 1px solid #2d3447;
+      border-radius: 14px;
+      padding: 25px;
+    }
+
+    .screen {
+      width: 80%;
+      max-width: 450px;
+      margin: 0 auto 45px;
+      padding: 12px;
+      text-align: center;
+      color: #111827;
+      background: #d8e3f0;
+      border-radius: 50% 50% 8px 8px;
+      box-shadow: 0 8px 30px rgba(93, 190, 255, 0.15);
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 4px;
+    }
+
+    .seat-map {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 5px 0 20px;
+    }
+
+    .seat-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      min-width: max-content;
+    }
+
+    .row-label {
+      width: 20px;
+      color: #aeb4c5;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .seat {
+      width: 32px;
+      height: 30px;
+      border: none;
+      border-radius: 7px 7px 4px 4px;
+      cursor: pointer;
+      background: #24c7a0;
+      color: #10231e;
+      font-size: 10px;
+      font-weight: bold;
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .seat:hover:not(:disabled) {
+      transform: scale(1.12);
+    }
+
+    .seat.selected {
+      background: #ffffff;
+      color: #151923;
+      outline: 2px solid #24c7a0;
+    }
+
+    .seat.booked {
+      background: #ef5350;
+      color: white;
+      cursor: not-allowed;
+      opacity: 0.75;
+    }
+
+    .seat-legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 25px;
+      color: #c3c8d5;
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .legend-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    .available-box {
+      background: #24c7a0;
+    }
+
+    .selected-box {
+      background: white;
+      border: 2px solid #24c7a0;
+    }
+
+    .booked-box {
+      background: #ef5350;
+    }
+
+    .summary-panel h2 {
+      font-size: 21px;
+      margin-bottom: 22px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #303648;
+      color: #c3c8d5;
+      font-size: 14px;
+    }
+
+    .summary-row strong {
+      color: white;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .total-row {
+      margin-top: 10px;
+      font-size: 17px;
+    }
+
+    .total-row strong {
+      color: #24c7a0;
+    }
+
+    .continue-button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 13px;
+      background: #24c7a0;
+      color: #10231e;
+      border: none;
+      border-radius: 7px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .continue-button:disabled {
+      background: #505766;
+      color: #c4c8d0;
+      cursor: not-allowed;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 17px;
+      color: #b7c0d3;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .empty-message {
+      text-align: center;
+      color: #f5b7b7;
+      padding: 25px 10px;
+    }
+
+    @media (max-width: 760px) {
+      .booking-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .event-heading h1 {
+        font-size: 24px;
+      }
+
+      .seat-panel,
+      .summary-panel {
+        padding: 18px 12px;
+      }
+
+      .seat {
+        width: 27px;
+        height: 27px;
+        font-size: 9px;
+      }
+
+      .seat-row {
+        gap: 5px;
+      }
+
+      .screen {
+        margin-bottom: 35px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <a th:href="@{/}" class="logo">Seat<span>ify</span></a>
+  <a th:href="@{/}" class="home-link">Back to Events</a>
+</header>
+
+<main class="container">
+
+  <section class="event-heading">
+    <h1 th:text="${event.name}">Event Name</h1>
+
+    <p>
+      <span th:text="${event.venue.name}">Venue</span>
+      ·
+      <span th:text="${event.venue.city}">City</span>
+    </p>
+
+    <p>
+      Select your preferred seats below.
+    </p>
+  </section>
+
+  <div class="booking-layout">
+
+    <!-- Seat selection -->
+    <section class="seat-panel">
+
+      <div class="screen">SCREEN</div>
+
+      <div class="seat-map" id="seatMap">
+
+        <!-- A row is generated for each seat row in the database -->
+        <div class="seat-row"
+             th:each="rowName : ${#sets.toSet(seats.![rowName])}">
+
+                    <span class="row-label"
+                          th:text="${rowName}">A</span>
+
+          <button type="button"
+                  class="seat"
+                  th:each="seat : ${seats}"
+                  th:if="${seat.rowName == rowName}"
+                  th:text="${seat.seatNumber}"
+                  th:attr="data-seat-id=${seat.id},
+                                     data-seat-number=${seat.seatNumber},
+                                     data-price=${seat.price},
+                                     data-seat-type=${seat.seatType}"
+                  th:classappend="${bookedSeatIds != null and bookedSeatIds.contains(seat.id)} ? ' booked' : ''"
+                  th:disabled="${bookedSeatIds != null and bookedSeatIds.contains(seat.id)}"
+                  th:title="${seat.seatType + ' - NPR ' + seat.price}">
+          </button>
+
+        </div>
+
+        <p class="empty-message"
+           th:if="${#lists.isEmpty(seats)}">
+          No seats are configured for this venue yet.
+        </p>
+
+      </div>
+
+      <div class="seat-legend">
+        <div class="legend-item">
+          <span class="legend-box available-box"></span>
+          Available
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-box selected-box"></span>
+          Selected
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-box booked-box"></span>
+          Booked
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Booking summary -->
+    <aside class="summary-panel">
+
+      <h2>Booking Summary</h2>
+
+      <div class="summary-row">
+        <span>Event</span>
+        <strong th:text="${event.name}">Event Name</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>Selected seats</span>
+        <strong id="selectedSeats">None</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>Total seats</span>
+        <strong id="seatCount">0</strong>
+      </div>
+
+      <div class="summary-row total-row">
+        <span>Total price</span>
+        <strong id="totalPrice">NPR 0.00</strong>
+      </div>
+
+      <!-- This form is only a UI placeholder until booking is implemented -->
+      <form id="bookingForm"
+            th:action="@{/bookings/confirm}"
+            method="post">
+
+        <input type="hidden"
+               name="eventId"
+               th:value="${event.id}">
+
+        <div id="selectedSeatInputs"></div>
+
+        <button type="submit"
+                id="continueButton"
+                class="continue-button"
+                disabled>
+          Continue to Booking
+        </button>
+
+      </form>
+
+      <a th:href="@{/events/{id}(id=${event.id})}"
+         class="back-link">
+        Back to Event Details
+      </a>
+
+    </aside>
+
+  </div>
+
+</main>
+
+<script>
+  const seats = document.querySelectorAll(".seat:not(:disabled)");
+  const selectedSeatsElement = document.getElementById("selectedSeats");
+  const seatCountElement = document.getElementById("seatCount");
+  const totalPriceElement = document.getElementById("totalPrice");
+  const continueButton = document.getElementById("continueButton");
+  const selectedSeatInputs = document.getElementById("selectedSeatInputs");
+
+  const selectedSeats = new Map();
+
+  seats.forEach(seat => {
+    seat.addEventListener("click", () => {
+      const seatId = seat.dataset.seatId;
+      const seatNumber = seat.dataset.seatNumber;
+      const price = Number(seat.dataset.price);
+
+      if (selectedSeats.has(seatId)) {
+        selectedSeats.delete(seatId);
+        seat.classList.remove("selected");
+      } else {
+        selectedSeats.set(seatId, {
+          number: seatNumber,
+          price: price
+        });
+
+        seat.classList.add("selected");
+      }
+
+      updateSummary();
+    });
+  });
+
+  function updateSummary() {
+    const selected = Array.from(selectedSeats.values());
+
+    const names = selected.map(seat => seat.number);
+    const total = selected.reduce((sum, seat) => sum + seat.price, 0);
+
+    selectedSeatsElement.textContent =
+            names.length > 0 ? names.join(", ") : "None";
+
+    seatCountElement.textContent = selected.length;
+
+    totalPriceElement.textContent =
+            "NPR " + total.toLocaleString("en-NP", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            });
+
+    continueButton.disabled = selected.length === 0;
+
+    selectedSeatInputs.replaceChildren();
+
+    selectedSeats.forEach((seat, seatId) => {
+      const input = document.createElement("input");
+
+      input.type = "hidden";
+      input.name = "seatIds";
+      input.value = seatId;
+
+      selectedSeatInputs.appendChild(input);
+    });
+  }
+
+  document.getElementById("bookingForm").addEventListener("submit", event => {
+    if (selectedSeats.size === 0) {
+      event.preventDefault();
+      alert("Please select at least one seat.");
+    }
+  });
+</script>
+
+</body>
+</html>

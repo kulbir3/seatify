@@ -43,4 +43,56 @@ public class EventService {
     public List<Events> getUpcomingEvents() {
         return eventRepo.findByEventDateGreaterThanEqual(LocalDate.now());
     }
+
+    public List<Events> searchEventsByNameAndCategory(
+            Long categoryId,
+            String name) {
+
+        String searchName = (name == null) ? "" : name.trim();
+
+        if (categoryId == null) {
+            return searchEvents(searchName);
+        }
+
+        if (searchName.isEmpty()) {
+            return eventRepo.findByCategory_Id(categoryId);
+        }
+
+        return eventRepo.findByNameContainingIgnoreCaseAndCategory_Id(
+                searchName, categoryId);
+    }
+
+    public List<Events> filterEvents(
+            String name,
+            Long categoryId,
+            LocalDate date) {
+
+        String searchName = (name == null) ? "" : name.trim();
+
+        if (categoryId != null && date != null) {
+            return eventRepo
+                    .findByNameContainingIgnoreCaseAndCategory_IdAndEventDate(
+                            searchName, categoryId, date);
+        }
+
+        if (categoryId != null) {
+            if (searchName.isEmpty()) {
+                return eventRepo.findByCategory_Id(categoryId);
+            }
+
+            return eventRepo.findByNameContainingIgnoreCaseAndCategory_Id(
+                    searchName, categoryId);
+        }
+
+        if (date != null) {
+            if (searchName.isEmpty()) {
+                return eventRepo.findByEventDate(date);
+            }
+
+            return eventRepo.findByNameContainingIgnoreCaseAndEventDate(
+                    searchName, date);
+        }
+
+        return searchEvents(searchName);
+    }
 }
