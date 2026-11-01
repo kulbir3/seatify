@@ -64,6 +64,25 @@
       font-size: 14px;
     }
 
+    /* My Bookings Button */
+    .bookings-button {
+      display: inline-block;
+      background: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .bookings-button:hover {
+      background: white;
+      color: #171923;
+    }
+
     /* Hero Section */
     .hero {
       background: linear-gradient(135deg, #24283b, #454b75);
@@ -309,6 +328,18 @@
         gap: 10px;
       }
 
+      .nav-right a {
+        font-size: 13px;
+      }
+
+      .bookings-button {
+        padding: 7px 9px;
+      }
+
+      .logout-button {
+        padding: 8px 10px;
+      }
+
       .hero {
         padding: 45px 5%;
       }
@@ -343,11 +374,25 @@
   </a>
 
   <div class="nav-right">
+
     <a th:href="@{/}">Home</a>
 
+    <!-- My Bookings Button -->
+    <a th:href="@{/my-bookings}" class="bookings-button">
+      My Bookings
+    </a>
+
+    <!-- Logout -->
     <form th:action="@{/logout}" method="post">
-      <button type="submit" class="logout-button">Logout</button>
+      <input type="hidden"
+             th:name="${_csrf.parameterName}"
+             th:value="${_csrf.token}">
+
+      <button type="submit" class="logout-button">
+        Logout
+      </button>
     </form>
+
   </div>
 
 </header>
@@ -431,20 +476,20 @@
 
         <span
                 th:if="${event.category.name != 'Movies'
-                        and event.category.name != 'Concerts'
-                        and event.category.name != 'Sports'}">
-                    🎟
-                </span>
+                  and event.category.name != 'Concerts'
+                  and event.category.name != 'Sports'}">
+          🎟
+        </span>
 
       </div>
 
       <div class="event-content">
 
-                <span
-                        class="category-badge"
-                        th:text="${event.category.name}">
-                    Category
-                </span>
+        <span
+                class="category-badge"
+                th:text="${event.category.name}">
+          Category
+        </span>
 
         <h3 th:text="${event.name}">
           Event Name
@@ -453,8 +498,8 @@
         <p
                 class="description"
                 th:text="${event.description != null
-                        ? event.description
-                        : 'Discover this exciting event.'}">
+                    ? event.description
+                    : 'Discover this exciting event.'}">
           Event description
         </p>
 
@@ -471,15 +516,15 @@
         <p class="event-info">
           <strong>📅 Date:</strong>
           <span th:text="${#temporals.format(event.eventDate, 'dd MMM yyyy')}">
-                        Event date
-                    </span>
+            Event date
+          </span>
         </p>
 
         <p class="event-info">
           <strong>🕒 Time:</strong>
           <span th:text="${#temporals.format(event.startTime, 'hh:mm a')}">
-                        Start time
-                    </span>
+            Start time
+          </span>
         </p>
 
         <div class="event-footer">

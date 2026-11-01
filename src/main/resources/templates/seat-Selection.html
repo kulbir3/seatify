@@ -80,19 +80,32 @@
       padding: 25px;
     }
 
-    .screen {
+    .event-stage {
       width: 80%;
       max-width: 450px;
       margin: 0 auto 45px;
       padding: 12px;
       text-align: center;
       color: #111827;
-      background: #d8e3f0;
-      border-radius: 50% 50% 8px 8px;
-      box-shadow: 0 8px 30px rgba(93, 190, 255, 0.15);
+      border-radius: 12px;
       font-size: 13px;
       font-weight: bold;
       letter-spacing: 4px;
+    }
+
+    .cinema-screen {
+      background: #d8e3f0;
+      border-radius: 50% 50% 8px 8px;
+    }
+
+    .concert-stage {
+      background: #a78bfa;
+      color: #ffffff;
+    }
+
+    .sports-stage {
+      background: #34d399;
+      color: #10231e;
     }
 
     .seat-map {
@@ -306,29 +319,30 @@
     <!-- Seat selection -->
     <section class="seat-panel">
 
-      <div class="screen">SCREEN</div>
+      <div class="event-stage"
+           th:classappend="${event.category.name == 'Concerts'} ? ' concert-stage' :
+                     (${event.category.name == 'Sports Events'} ? ' sports-stage' : ' cinema-screen')"
+           th:text="${event.category.name == 'Concerts'} ? 'STAGE' :
+              (${event.category.name == 'Sports Events'} ? 'COURT' : 'SCREEN')">
+      </div>
 
       <div class="seat-map" id="seatMap">
 
-        <!-- A row is generated for each seat row in the database -->
         <div class="seat-row"
              th:each="rowName : ${#sets.toSet(seats.![rowName])}">
 
-                    <span class="row-label"
-                          th:text="${rowName}">A</span>
+    <span class="row-label"
+          th:text="${rowName}">A</span>
 
           <button type="button"
                   class="seat"
-                  th:each="seat : ${seats}"
-                  th:if="${seat.rowName == rowName}"
-                  th:text="${seat.seatNumber}"
-                  th:attr="data-seat-id=${seat.id},
-                                     data-seat-number=${seat.seatNumber},
-                                     data-price=${seat.price},
-                                     data-seat-type=${seat.seatType}"
-                  th:classappend="${bookedSeatIds != null and bookedSeatIds.contains(seat.id)} ? ' booked' : ''"
-                  th:disabled="${bookedSeatIds != null and bookedSeatIds.contains(seat.id)}"
-                  th:title="${seat.seatType + ' - NPR ' + seat.price}">
+                  th:each="seat : ${seats.?[rowName == #vars.rowName]}"
+                  th:classappend="${bookedSeatIds.contains(seat.id)} ? ' booked' : ''"
+                  th:disabled="${bookedSeatIds.contains(seat.id)}"
+                  th:data-seat-id="${seat.id}"
+                  th:data-seat-number="${seat.rowName + seat.seatNumber}"
+                  th:data-price="${seat.price}"
+                  th:text="${seat.rowName + seat.seatNumber}">
           </button>
 
         </div>
@@ -389,10 +403,17 @@
             th:action="@{/bookings/confirm}"
             method="post">
 
+        <!-- Event ID -->
         <input type="hidden"
                name="eventId"
                th:value="${event.id}">
 
+        <!-- Spring Security CSRF token -->
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}">
+
+        <!-- JavaScript inserts selected seat IDs here -->
         <div id="selectedSeatInputs"></div>
 
         <button type="submit"

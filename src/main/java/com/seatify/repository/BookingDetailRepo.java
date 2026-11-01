@@ -5,7 +5,7 @@ import com.seatify.entity.Booking.BookingStatus;
 import com.seatify.entity.BookingDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.*;
 
 public interface BookingDetailRepo
         extends JpaRepository<BookingDetail, Long> {
@@ -23,5 +23,10 @@ public interface BookingDetailRepo
     List<BookingDetail> findByEvent_IdAndBooking_Status(
             Long eventId,
             BookingStatus status
+    );
+
+    Optional<BookingDetail> findByIdAndBooking_Id(
+            Long detailId,
+            Long bookingId
     );
 }
