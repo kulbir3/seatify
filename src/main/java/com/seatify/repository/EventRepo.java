@@ -27,6 +27,7 @@ public interface EventRepo extends JpaRepository<Events, Long> {
             LocalDate eventDate
     );
 
+
     List<Events> findByCategory_IdAndEventDate(
             Long categoryId,
             LocalDate eventDate

@@ -23,7 +23,6 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
 
-                        // Public pages
                         .requestMatchers(
                                 "/",
                                 "/login",
@@ -33,9 +32,9 @@ public class SecurityConfig {
                                 "/images/**"
                         ).permitAll()
 
-                        .requestMatchers("/events/**").authenticated()
-
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        .requestMatchers("/events/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
@@ -44,7 +43,18 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/", true)
+                        .successHandler((request, response, authentication) -> {
+
+                            boolean isAdmin = authentication.getAuthorities().stream()
+                                    .anyMatch(authority ->
+                                            authority.getAuthority().equals("ROLE_ADMIN"));
+
+                            if (isAdmin) {
+                                response.sendRedirect("/admin");
+                            } else {
+                                response.sendRedirect("/");
+                            }
+                        })
                         .failureUrl("/login?error")
                         .permitAll()
                 )
